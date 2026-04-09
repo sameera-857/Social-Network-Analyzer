@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SIM Network - Final Phase 2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono&family=Syne:wght@700&display=swap');
+
+        :root {
+            --bg: #0a0e1a;
+            --card: #111827;
+            --accent: #00d4ff;
+            --accent-gold: #fbbf24;
+            --error: #ef4444;
+        }
+
+        body { background: var(--bg); color: #e2e8f0; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .wrapper { max-width: 1000px; margin: 0 auto; }
+
+        /* Screens */
+        .screen { display: none; }
+        .active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Auth Card */
+        .auth-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid #1e2d45;
+            text-align: center;
+            max-width: 380px;
+            margin: 60px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .logo { font-family: 'Syne'; font-size: 32px; color: var(--accent); margin-bottom: 20px; }
+        
+        /* Auth Tabs */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: #0f172a;
+            color: #64748b;
+            border: 1px solid #1e2d45;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .auth-tab.active-tab {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        select option { background: #111827; color: white; }
+
+        .btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Friend Selection */
+        .friend-list { display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; margin: 20px 0; 
+        }
+        .person { padding: 15px;
+             border: 1px solid #334155; 
+             border-radius: 10px; cursor: 
+             pointer; font-size: 14px;
+            }
+        .person.picked { 
+            border-color: #10b981; 
+            background: rgba(16, 185, 129, 0.1); 
+        }
+
+        /* Dashboard */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; margin-bottom: 
+            20px; 
+            border-bottom: 1px solid #1e2d45; 
+            padding-bottom: 15px; 
+        }
+        .canvas-box { 
+            background: #0f172a; 
+            border-radius: 15px; 
+            border: 1px solid #1e2d45; 
+            margin-bottom: 20px; 
+            position: relative; 
+        }
+        canvas { 
+            width: 100%; 
+        }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+        .box { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 12px; 
+            height: 220px; 
+            overflow-y: auto; 
+            font-family: 'Space Mono', monospace; 
+            font-size: 12px; 
+            border: 1px solid #1e2d45; 
+        }
+        .box h3 { 
+            margin: 0 0 10px 0; 
+            font-size: 14px; 
+            color: var(--accent); 
+            border-bottom: 1px solid #1e2d45; 
+            padding-bottom: 5px; 
+        }
+
+        /* Influencers Section */
+        .influencer-box { 
+            border: 2px solid var(--accent-gold);
+            background: rgba(251, 191, 36, 0.05); 
+        }
+        .influencer-box h3 { 
+            color: var(--accent-gold); 
+            border-bottom-color: var(--accent-gold); 
+        }
+        .inf-rank { 
+            font-size: 14px; 
+            font-weight: bold; color: white; 
+            margin-bottom: 8px; display: flex;
+            align-items: center; gap: 10px; 
+        }
+
+        .logout { 
+            color: var(--error); 
+            border: 1px solid var(--error); 
+            background: transparent; 
+            padding: 5px 12px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <div id="authScreen" class="screen active">
+        <div class="auth-card">
+            <div class="logo">SIM.net</div>
+            
+            <div class="tab-container">
+                <button class="auth-tab active-tab" id="tabLogin" onclick="setAuthMode('login')">Login</button>
+                <button class="auth-tab" id="tabSignup" onclick="setAuthMode('signup')">Create Account</button>
+            </div>
+
+            <p id="authDesc" style="font-size: 14px; color: #64748b; margin-bottom: 20px;">Welcome back! Enter your login details.</p>
+            
+            <input type="text" id="userField" placeholder="Username">
+            <input type="password" id="passField" placeholder="Password">
+            
+            <div id="signupOnly" style="display: none;">
+                <select id="interestField">
+                    <option value="" disabled selected>Select Primary Interest</option>
+                    <option value="Tech">Tech</option>
+                    <option value="Music">Music</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Gaming">Gaming</option>
+                </select>
+            </div>
+
+            <button class="btn" id="authSubmitBtn" onclick="processAuth()">Login</button>
+        </div>
+    </div>
+
+    <div id="friendScreen" class="screen">
+        <div class="auth-card" style="max-width: 500px;">
+            <h2>Build Your Network</h2>
+            <p>Select friends to initialize the graph.</p>
+            <div class="friend-list">
+                <div class="person" onclick="pickFriend(this, 'Sameera', 'Tech')">Sameera (Tech)</div>
+                <div class="person" onclick="pickFriend(this, 'Mayank', 'Sports')">Mayank (Sports)</div>
+                <div class="person" onclick="pickFriend(this, 'Aanya', 'Gaming')">Aanya (Gaming)</div>
+                <div class="person" onclick="pickFriend(this, 'Rohan', 'Music')">Rohan (Music)</div>
+            </div>
+            <button class="btn" onclick="showDashboard()">Finish & Analyze</button>
+        </div>
+    </div>
+
+    <div id="dashScreen" class="screen">
+        <div class="header">
+            <div class="logo" style="font-size: 20px;">SIM ANALYZER</div>
+            <div>
+                <span id="welcomeMsg" style="margin-right: 15px;"></span>
+                <button class="logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="canvas-box">
+            <canvas id="mainCanvas" height="400"></canvas>
+            <div style="text-align: center; font-size: 11px; padding: 10px; color: #64748b;">
+                Interactive: Hover over nodes to highlight local clusters
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="box influencer-box">
+                <h3>👑 Top Influencers (Degree)</h3>
+                <div id="infOut"></div>
+            </div>
+            
+            <div class="box"><h3>Adjacency List</h3><div id="adjOut"></div></div>
+            <div class="box"><h3>Communities (DFS)</h3><div id="dfsOut"></div></div>
+            <div class="box"><h3>Echo Chambers</h3><div id="echoOut"></div></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+   // --- Global State ---
+    let isLoginMode = true;
+    let userData = { name: "", interest: "Tech" };
+    let myFriends = [];
+    let nodes = [];
+    let adjList = [];
+    let hoveredId = -1;
+
+    const dummyNames = ["Sneha", "Rahul", "Kavya", "Amit", "Diya", "Siddharth", "Meera", "Karan"];
+    const colors = ["#00d4ff", "#7c3aed", "#10b981", "#fbbf24", "#f87171"];
+
+    // --- Authentication Logic ---
+    function setAuthMode(mode) {
+        isLoginMode = (mode === 'login');
+        
+        // Update Tabs
+        document.getElementById('tabLogin').classList.toggle('active-tab', isLoginMode);
+        document.getElementById('tabSignup').classList.toggle('active-tab', !isLoginMode);
+        
+        // Update Text & Forms
+        document.getElementById('authDesc').innerText = isLoginMode ? "Welcome back! Enter your login details." : "Join the network! Create a new profile.";
+        document.getElementById('authSubmitBtn').innerText = isLoginMode ? "Login" : "Create Account";
+        document.getElementById('signupOnly').style.display = isLoginMode ? "none" : "block";
+    }
+
+    function processAuth() {
+        const u = document.getElementById('userField').value;
+        const p = document.getElementById('passField').value;
+        const interest = document.getElementById('interestField').value;
+
+        if(!u || !p) return alert("Please fill in your username and password!");
+
+        if (isLoginMode) {
+            // Mock Login Check
+            if(p !== "admin123") {
+                return alert("Incorrect password! (Hint: use 'admin123' for the demo)");
+            }
+            userData.interest = "Tech"; 
+        } else {
+            // Mock Create Account Check
+            if(!interest) return alert("Please select your primary interest!");
+            userData.interest = interest;
+        }
+
+        userData.name = u;
+        
+        document.getElementById('authScreen').classList.remove('active');
+        document.getElementById('friendScreen').classList.add('active');
+    }
+
+    // --- Friend Selection ---
+    function pickFriend(el, name, interest) {
+        el.classList.toggle('picked');
+        const i = myFriends.findIndex(f => f.name === name);
+        if (i > -1) myFriends.splice(i, 1);
+        else myFriends.push({name, interest});
+    }
+
+    function showDashboard() {
+        document.getElementById('friendScreen').classList.remove('active');
+        document.getElementById('dashScreen').classList.add('active');
+        document.getElementById('welcomeMsg').innerText = "User: " + userData.name;
+        startEngine();
+    }
+
+    function logout() {
+        location.reload(); 
+    }
+
+    // --- Graph Engine ---
+    function startEngine() {
+        nodes = [];
+        adjList = Array.from({length: 15}, () => []);
+
+        nodes.push({ id: 0, name: userData.name, interest: userData.interest, isMe: true });
+
+        myFriends.forEach((f, i) => {
+            nodes.push({ id: i+1, name: f.name, interest: f.interest });
+            adjList[0].push(i+1); adjList[i+1].push(0);
+        });
+
+        for(let i = nodes.length; i < 15; i++) {
+            nodes.push({ id: i, name: dummyNames[i%8], interest: ["Tech","Music","Sports","Gaming"][i%4] });
+        }
+
+        for(let i=0; i<22; i++) {
+            let u = Math.floor(Math.random()*15);
+            let v = Math.floor(Math.random()*15);
+            if(u !== v && !adjList[u].includes(v)) {
+                adjList[u].push(v); adjList[v].push(u);
+            }
+        }
+
+        const canvas = document.getElementById('mainCanvas');
+        const W = canvas.width = canvas.offsetWidth;
+        const H = 400;
+
+        nodes.forEach(n => {
+            n.x = n.isMe ? W/2 : Math.random()*W;
+            n.y = n.isMe ? H/2 : Math.random()*H;
+        });
+
+        for(let s=0; s<120; s++) {
+            nodes.forEach((n1, i) => {
+                nodes.forEach((n2, j) => {
+                    if(i === j) return;
+                    let dx = n2.x - n1.x, dy = n2.y - n1.y;
+                    let d = Math.hypot(dx, dy) || 1;
+                    if(d < 90) { 
+                        let f = (90 - d) * 0.06;
+                        if(!n1.isMe) { n1.x -= (dx/d)*f; n1.y -= (dy/d)*f; }
+                    }
+                });
+                adjList[n1.id].forEach(fid => {
+                    let f = nodes[fid];
+                    let dx = f.x - n1.x, dy = f.y - n1.y;
+                    let d = Math.hypot(dx, dy) || 1;
+                    if(d > 130) { 
+                        let pull = (d - 130) * 0.03;
+                        if(!n1.isMe) { n1.x += (dx/d)*pull; n1.y += (dy/d)*pull; }
+                    }
+                });
+            });
+        }
+
+        runAlgorithms();
+        drawGraph(); // Re-painted without scrambling
+    }
+
+    function runAlgorithms() {
+        // Adj List
+        document.getElementById('adjOut').innerHTML = nodes.map(n => `<div style="margin-bottom: 5px;">${n.name}: <span style="color:#64748b">[${adjList[n.id].map(id=>nodes[id].name).join(", ")}]</span></div>`).join("");
+
+        // DFS
+        let visited = new Array(15).fill(false);
+        let clusters = [];
+        nodes.forEach(n => {
+            if(!visited[n.id]) {
+                let comp = []; let stack = [n.id];
+                while(stack.length) {
+                    let curr = stack.pop();
+                    if(!visited[curr]) {
+                        visited[curr] = true; comp.push(curr);
+                        nodes[curr].cluster = clusters.length;
+                        adjList[curr].forEach(neigh => stack.push(neigh));
+                    }
+                }
+                clusters.push(comp);
+            }
+        });
+        document.getElementById('dfsOut').innerHTML = clusters.map((c, i) => `<div style="margin-bottom: 5px; color:${colors[i%5]}">Cluster ${i+1}: ${c.map(id=>nodes[id].name).join(", ")}</div>`).join("");
+
+        // Centrality (Influencers) - Upgraded UI
+        let top = [...nodes].sort((a,b) => adjList[b.id].length - adjList[a.id].length);
+        document.getElementById('infOut').innerHTML = top.slice(0,4).map((n, i) => `
+            <div class="inf-rank">
+                <span style="color: #fbbf24; font-size: 16px;">#${i+1}</span> 
+                ${n.name} 
+                <span style="font-size: 11px; color: #10b981; font-weight: normal; margin-left: auto;">(${adjList[n.id].length} friends)</span>
+            </div>
+        `).join("");
+
+        // Echo
+        let echo = "";
+        nodes.forEach(n => {
+            let s = adjList[n.id].filter(id => nodes[id].interest === n.interest).length;
+            if(adjList[n.id].length > 0 && (s/adjList[n.id].length) >= 0.6) echo += `<div style="color:#ef4444; margin-bottom: 5px;">⚠ ${n.name} is in an echo chamber!</div>`;
+        });
+        document.getElementById('echoOut').innerHTML = echo || "<div style='color:#10b981'>Network is diverse. Clear.</div>";
+    }
+
+    // --- REPAINT FUNCTION ---
+    function drawGraph() {
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        adjList.forEach((friends, u) => {
+            friends.forEach(v => {
+                if(u < v) {
+                    let active = (hoveredId === -1 || hoveredId === u || hoveredId === v);
+                    ctx.strokeStyle = active ? "rgba(0,212,255,0.6)" : "rgba(255,255,255,0.03)";
+                    ctx.lineWidth = (hoveredId === u || hoveredId === v) ? 2 : 1;
+                    ctx.beginPath(); ctx.moveTo(nodes[u].x, nodes[u].y); ctx.lineTo(nodes[v].x, nodes[v].y); ctx.stroke();
+                }
+            });
+        });
+        
+        nodes.forEach(n => {
+            let active = (hoveredId === -1 || hoveredId === n.id || adjList[n.id].includes(hoveredId));
+            ctx.globalAlpha = active ? 1 : 0.15;
+            ctx.fillStyle = n.isMe ? "#fbbf24" : colors[n.cluster % 5];
+            ctx.beginPath(); ctx.arc(n.x, n.y, n.isMe ? 12 : 8, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "white"; ctx.font = "10px Arial"; ctx.fillText(n.name, n.x - 15, n.y + 20);
+            ctx.globalAlpha = 1;
+        });
+    }
+
+    document.getElementById('mainCanvas').onmousemove = (e) => {
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        let found = -1;
+        nodes.forEach(n => { if(Math.hypot(n.x - x, n.y - y) < 15) found = n.id; });
+        if(found !== hoveredId) { 
+            hoveredId = found; 
+            drawGraph(); 
+        }
+    };
+
+    document.getElementById('mainCanvas').onmouseleave = () => {
+        if (hoveredId !== -1) {
+            hoveredId = -1;
+            drawGraph();
+        }
+    };
+</script>
+</body>
+</html>
