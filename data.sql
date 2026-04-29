@@ -1,0 +1,30 @@
+DELETE FROM nodes;
+DELETE FROM edges;
+
+INSERT INTO nodes (id, interest, name) VALUES (0, 'Politics', 'Karan');
+INSERT INTO nodes (id, interest, name) VALUES (1, 'Coding', 'Pooja');
+INSERT INTO nodes (id, interest, name) VALUES (2, 'Politics', 'Amit');
+INSERT INTO nodes (id, interest, name) VALUES (3, 'Dancing', 'Rohan');
+INSERT INTO nodes (id, interest, name) VALUES (4, 'Music', 'Ankit');
+INSERT INTO nodes (id, interest, name) VALUES (5, 'Music', 'Dev');
+INSERT INTO nodes (id, interest, name) VALUES (6, 'Coding', 'Simran');
+INSERT INTO nodes (id, interest, name) VALUES (7, 'Sports', 'Varun');
+INSERT INTO nodes (id, interest, name) VALUES (8, 'Dancing', 'Arjun');
+INSERT INTO nodes (id, interest, name) VALUES (9, 'Coding', 'Siddharth');
+INSERT INTO nodes (id, interest, name) VALUES (10, 'Sports', 'Meera');
+INSERT INTO nodes (id, interest, name) VALUES (11, 'Politics', 'Raj');
+
+INSERT INTO edges (src, dest) VALUES (0, 3);
+INSERT INTO edges (src, dest) VALUES (0, 1);
+INSERT INTO edges (src, dest) VALUES (0, 7);
+INSERT INTO edges (src, dest) VALUES (0, 8);
+INSERT INTO edges (src, dest) VALUES (1, 6);
+INSERT INTO edges (src, dest) VALUES (2, 5);
+INSERT INTO edges (src, dest) VALUES (2, 8);
+INSERT INTO edges (src, dest) VALUES (3, 4);
+INSERT INTO edges (src, dest) VALUES (4, 5);
+INSERT INTO edges (src, dest) VALUES (4, 7);
+INSERT INTO edges (src, dest) VALUES (5, 11);
+INSERT INTO edges (src, dest) VALUES (6, 10);
+INSERT INTO edges (src, dest) VALUES (7, 9);
+INSERT INTO edges (src, dest) VALUES (8, 11);
