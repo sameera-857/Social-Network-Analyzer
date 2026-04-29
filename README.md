@@ -139,6 +139,3 @@ All four algorithms are implemented in `main.cpp` and run on the generated graph
 
 ---
 
-## Author
-
-**Sameera** — academic project for demonstrating graph algorithms in a full-stack context.
